@@ -2,6 +2,7 @@ package view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -66,12 +67,13 @@ public class LeftRightRelativeLayout extends RelativeLayout {
 //            mRightView.layout(rightLeft, rightTop, rightRight, rightBottom);
 
             //内部子控件居于父控件底部：
-            int bottom = getMeasuredHeight();
-            int top =getMeasuredHeight() - mLeftView.getMeasuredHeight();
-            int leftRight = mLeftViewLeft + mLeftView.getMeasuredWidth();
-            int rightRight = leftRight + mRightView.getMeasuredWidth();
-            mLeftView.layout(mLeftViewLeft, top, leftRight, bottom);
-            mRightView.layout(leftRight, top, rightRight, bottom);
+                int bottom = getMeasuredHeight();
+                int top =getMeasuredHeight() - mLeftView.getMeasuredHeight();
+                int leftRight = mLeftViewLeft + mLeftView.getMeasuredWidth();
+                int rightRight = leftRight + mRightView.getMeasuredWidth();
+                mLeftView.layout(mLeftViewLeft, top, leftRight, bottom);
+                mRightView.layout(leftRight, top, rightRight, bottom);
+
         }
 
 }

@@ -1,16 +1,20 @@
 package view;
 
+import android.app.DialogFragment;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.MotionEvent;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 
 import com.dabing.learnandroid.R;
 
@@ -23,13 +27,10 @@ import view.wheelview.WheelView;
 import view.wheelview.adapter.AbstractWheelTextAdapter1;
 
 /**
- * Author:  Chen.yuan
- * Email:   hubeiqiyuan2010@163.com
- * Date:    2016/7/28 17:37
- * Description:日期选择window
+ * Created by dabing on 2017/10/6.
  */
-public class ChangeDatePopwindow extends PopupWindow implements View.OnClickListener {
 
+public class DateChooseDialogFragment extends DialogFragment implements View.OnClickListener {
     private Context context;
     private WheelView wvYear;
     private WheelView wvMonth;
@@ -51,6 +52,9 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
     private String currentYear = getYear();
     private String currentMonth = getMonth();
     private String currentDay = getDay();
+    private String currentEndYear = getYear();
+    private String currentEndMonth = getMonth();
+    private String currentEndDay = getDay();
 
     private int maxTextSize = 24;
     private int minTextSize = 14;
@@ -64,28 +68,45 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
     private String selectEndYear;
     private String selectEndMonth;
     private String selectEndDay;
-    private OnBirthListener onBirthListener;
+    private ChangeDatePopwindow.OnBirthListener onBirthListener;
     private LinearLayout startDateLinear;
     private LinearLayout endDateLinear;
     float downX = 0;
     float moveX = 0;
-    private final TextView nextStep;
-    private final TextView upStep;
-    private final WheelView endYear;
-    private final WheelView endMonth;
-    private final WheelView endDay;
+    private TextView nextStep;
+    private TextView upStep;
+    private WheelView endYear;
+    private WheelView endMonth;
+    private WheelView endDay;
     private CalendarTextAdapter endMonthAdapter;
     private CalendarTextAdapter endDaydapter;
     private CalendarTextAdapter endYearAdapter;
+    private View view;
+    public static int POSITION_LEFT = 0;//左侧
+    public static int POSITION_RIGHT = 1;//右侧
+    private int position = 0;//默认展示左侧还是右侧
 
-    public ChangeDatePopwindow(final Context context) {
-        super(context);
-        this.context = context;
-        View view = View.inflate(context, R.layout.dialog_myinfo_changebirth3, null);
+
+    public static DateChooseDialogFragment getInstance(int position){
+        DateChooseDialogFragment dateChooseDialogFragment = new DateChooseDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("position",position);
+        dateChooseDialogFragment.setArguments(bundle);
+        return  dateChooseDialogFragment;
+    }
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        Bundle arguments = getArguments();
+        position = arguments.getInt("position", 0);
+        view = inflater.inflate(R.layout.dialog_myinfo_changebirth3, null);
+        context = getActivity();
+        CustomerHorizontalScrollView csv = (CustomerHorizontalScrollView) view.findViewById(R.id.date_container);
 
         startDateLinear = (LinearLayout) view.findViewById(R.id.start_date_linear);
         endDateLinear = (LinearLayout) view.findViewById(R.id.end_date_linear);
-
         btnCancel = (TextView) view.findViewById(R.id.btn_cancel);
         nextStep = (TextView) view.findViewById(R.id.btn_next_step);
         upStep = (TextView) view.findViewById(R.id.btn_up_step);
@@ -95,6 +116,7 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
         wvMonth = (WheelView) view.findViewById(R.id.wv_birth_month);
         wvDay = (WheelView) view.findViewById(R.id.wv_birth_day);
 
+
         endYear = (WheelView) view.findViewById(R.id.wv_end_year);
         endMonth = (WheelView) view.findViewById(R.id.wv_end_month);
         endDay = (WheelView) view.findViewById(R.id.wv_end_day);
@@ -103,33 +125,18 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
         nextStep.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDateLinear.animate().translationX(-startDateLinear.getMeasuredWidth());
-                endDateLinear.animate().translationX(-startDateLinear.getMeasuredWidth());
+                    startDateLinear.animate().translationX(-startDateLinear.getMeasuredWidth());
+                    endDateLinear.animate().translationX(-startDateLinear.getMeasuredWidth());
             }
         });
         upStep.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDateLinear.animate().translationX(0);
-                endDateLinear.animate().translationX(0);
+                    startDateLinear.animate().translationX(0);
+                    endDateLinear.animate().translationX(0);
 
             }
         });
-
-        //设置SelectPicPopupWindow的View
-        this.setContentView(view);
-        //设置SelectPicPopupWindow弹出窗体的宽
-        this.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        //设置SelectPicPopupWindow弹出窗体的高
-        this.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
-        //设置SelectPicPopupWindow弹出窗体可点击
-        this.setFocusable(true);
-        //设置SelectPicPopupWindow弹出窗体动画效果
-//		this.setAnimationStyle(R.style.AnimBottom);
-        //实例化一个ColorDrawable颜色为半透明
-        ColorDrawable dw = new ColorDrawable(0xb0000000);
-        //设置SelectPicPopupWindow弹出窗体的背景
-        this.setBackgroundDrawable(dw);
 
         btnSure.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
@@ -140,25 +147,26 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
         initYears();
         handleStartDate();
         handleEndDate();
+        return view;
     }
 
     private void handleEndDate() {
-        endYearAdapter = new CalendarTextAdapter(context, arry_years, setYear(currentYear), maxTextSize, minTextSize);
+        endYearAdapter = new CalendarTextAdapter(context, arry_years, setYear(currentEndYear), maxTextSize, minTextSize);
         endYear.setVisibleItems(5);
         endYear.setViewAdapter(endYearAdapter);
-        endYear.setCurrentItem(setYear(currentYear));
+        endYear.setCurrentItem(setYear(currentEndYear));
 
         initMonths(Integer.parseInt(month));
-        endMonthAdapter = new CalendarTextAdapter(context, arry_months, setMonth(currentMonth), maxTextSize, minTextSize);
+        endMonthAdapter = new CalendarTextAdapter(context, arry_months, setMonth(currentEndMonth), maxTextSize, minTextSize);
         endMonth.setVisibleItems(5);
         endMonth.setViewAdapter(endMonthAdapter);
-        endMonth.setCurrentItem(setMonth(currentMonth));
+        endMonth.setCurrentItem(setMonth(currentEndMonth));
 
         initDays(Integer.parseInt(day));
-        endDaydapter = new CalendarTextAdapter(context, arry_days, Integer.parseInt(currentDay) - 1, maxTextSize, minTextSize);
+        endDaydapter = new CalendarTextAdapter(context, arry_days, Integer.parseInt(currentEndDay) - 1, maxTextSize, minTextSize);
         endDay.setVisibleItems(5);
         endDay.setViewAdapter(endDaydapter);
-        endDay.setCurrentItem(Integer.parseInt(currentDay) - 1);
+        endDay.setCurrentItem(Integer.parseInt(currentEndDay) - 1);
 
         endYear.addChangingListener(new OnWheelChangedListener() {
 
@@ -167,15 +175,15 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
                 String currentText = (String) endYearAdapter.getItemText(wheel.getCurrentItem());
                 selectEndYear = currentText;
                 setTextViewSize(currentText, endYearAdapter);
-                currentYear = currentText.substring(0, currentText.length() - 1).toString();
-                setYear(currentYear);
+                currentEndYear = currentText.substring(0, currentText.length() - 1).toString();
+                setYear(currentEndYear);
                 initMonths(Integer.parseInt(month));
                 endMonthAdapter = new CalendarTextAdapter(context, arry_months, 0, maxTextSize, minTextSize);
                 endMonth.setVisibleItems(5);
                 endMonth.setViewAdapter(endMonthAdapter);
                 endMonth.setCurrentItem(0);
 
-                calDays(currentYear, month);
+                calDays(currentEndYear, month);
             }
         });
 
@@ -207,7 +215,7 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
                 endDay.setViewAdapter(endDaydapter);
                 endDay.setCurrentItem(0);
 
-                calDays(currentYear, month);
+                calDays(currentEndYear, month);
             }
         });
 
@@ -406,7 +414,7 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
         }
     }
 
-    public void setBirthdayListener(OnBirthListener onBirthListener) {
+    public void setBirthdayListener(ChangeDatePopwindow.OnBirthListener onBirthListener) {
         this.onBirthListener = onBirthListener;
     }
 
@@ -431,20 +439,20 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
     /**
      * 设置字体大小
      *
-     * @param curriteItemText
+     * @param currentItemText
      * @param adapter
      */
-    public void setTextViewSize(String curriteItemText, CalendarTextAdapter adapter) {
+    public void setTextViewSize(String currentItemText, CalendarTextAdapter adapter) {
         ArrayList<View> arrayList = adapter.getTestViews();
         int size = arrayList.size();
         String currentText;
         for (int i = 0; i < size; i++) {
-            TextView textvew = (TextView) arrayList.get(i);
-            currentText = textvew.getText().toString();
-            if (curriteItemText.equals(currentText)) {
-                textvew.setTextSize(maxTextSize);
+            TextView textView = (TextView) arrayList.get(i);
+            currentText = textView.getText().toString();
+            if (currentItemText.equals(currentText)) {
+                textView.setTextSize(maxTextSize);
             } else {
-                textvew.setTextSize(minTextSize);
+                textView.setTextSize(minTextSize);
             }
         }
     }
@@ -575,5 +583,22 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
 //		if (year.equals( getYear()) && month .equals( getMonth())) {
 //			this.day = getDay();//为了显示到当前月的当前日
 //		}
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        //得到dialog对应的window
+        Window window = getDialog().getWindow();
+        if (window != null) {
+            //得到LayoutParams
+            WindowManager.LayoutParams params = window.getAttributes();
+
+            //修改gravity
+            params.gravity = Gravity.BOTTOM;
+            params.width = WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(params);
+        }
     }
 }

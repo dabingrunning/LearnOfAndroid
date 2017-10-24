@@ -1,49 +1,51 @@
-package view;
+package com.dabing.learnandroid;
 
 import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-
-import com.dabing.learnandroid.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import view.ChangeDatePopwindow;
 import view.wheelview.OnWheelChangedListener;
 import view.wheelview.OnWheelScrollListener;
 import view.wheelview.WheelView;
 import view.wheelview.adapter.AbstractWheelTextAdapter1;
 
 /**
- * Author:  Chen.yuan
- * Email:   hubeiqiyuan2010@163.com
- * Date:    2016/7/28 17:37
- * Description:日期选择window
+ * Created by dabing on 2017/10/9.
  */
-public class ChangeDatePopwindow extends PopupWindow implements View.OnClickListener {
 
-    private Context context;
+public class DatePagerActivity  extends AppCompatActivity{
+
+    private ViewPager date_pager;
+    private LinearLayout startDateLinear;
+    private LinearLayout endDateLinear;
+    private TextView btnCancel;
+    private TextView btnSure;
     private WheelView wvYear;
     private WheelView wvMonth;
+    private WheelView endYear;
+    private WheelView endMonth;
+    private WheelView endDay;
     private WheelView wvDay;
 
-    private TextView btnSure;
-    private TextView btnCancel;
-
-    private ArrayList<String> arry_years = new ArrayList<String>();
-    private ArrayList<String> arry_months = new ArrayList<String>();
-    private ArrayList<String> arry_days = new ArrayList<String>();
+    private ArrayList<String> array_years = new ArrayList<>();
+    private ArrayList<String> array_months = new ArrayList<>();
+    private ArrayList<String> array_days = new ArrayList<>();
     private CalendarTextAdapter mYearAdapter;
     private CalendarTextAdapter mMonthAdapter;
-    private CalendarTextAdapter mDaydapter;
+    private CalendarTextAdapter mDayAdapter;
 
     private String month;//一年中的月份
     private String day;//月份中的天数
@@ -51,6 +53,9 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
     private String currentYear = getYear();
     private String currentMonth = getMonth();
     private String currentDay = getDay();
+    private String currentEndYear = getYear();
+    private String currentEndMonth = getMonth();
+    private String currentEndDay = getDay();
 
     private int maxTextSize = 24;
     private int minTextSize = 14;
@@ -64,75 +69,53 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
     private String selectEndYear;
     private String selectEndMonth;
     private String selectEndDay;
-    private OnBirthListener onBirthListener;
-    private LinearLayout startDateLinear;
-    private LinearLayout endDateLinear;
-    float downX = 0;
-    float moveX = 0;
-    private final TextView nextStep;
-    private final TextView upStep;
-    private final WheelView endYear;
-    private final WheelView endMonth;
-    private final WheelView endDay;
+    private ChangeDatePopwindow.OnBirthListener onBirthListener;
     private CalendarTextAdapter endMonthAdapter;
-    private CalendarTextAdapter endDaydapter;
+    private CalendarTextAdapter endDayAdapter;
     private CalendarTextAdapter endYearAdapter;
 
-    public ChangeDatePopwindow(final Context context) {
-        super(context);
-        this.context = context;
-        View view = View.inflate(context, R.layout.dialog_myinfo_changebirth3, null);
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.dialog_date_pager);
+        date_pager = (ViewPager) findViewById(R.id.date_pager);
+        View leftView = LayoutInflater.from(this).inflate(R.layout.pager_item_left, null);
+        View rightView = LayoutInflater.from(this).inflate(R.layout.pager_item_right, null);
+        ArrayList<View> views = new ArrayList<>();
+        views.add(leftView);
+        views.add(rightView);
+        startDateLinear = (LinearLayout) leftView.findViewById(R.id.start_date_linear);
+        endDateLinear = (LinearLayout) rightView.findViewById(R.id.end_date_linear);
+        btnCancel = (TextView) leftView.findViewById(R.id.btn_cancel);
+        TextView nextStep = (TextView) leftView.findViewById(R.id.btn_next_step);
+        TextView upStep = (TextView) rightView.findViewById(R.id.btn_up_step);
+        btnSure = (TextView) rightView.findViewById(R.id.btn_sure);
 
-        startDateLinear = (LinearLayout) view.findViewById(R.id.start_date_linear);
-        endDateLinear = (LinearLayout) view.findViewById(R.id.end_date_linear);
+        wvYear = (WheelView) leftView.findViewById(R.id.wv_birth_year);
+        wvMonth = (WheelView) leftView.findViewById(R.id.wv_birth_month);
+        wvDay = (WheelView) leftView.findViewById(R.id.wv_birth_day);
 
-        btnCancel = (TextView) view.findViewById(R.id.btn_cancel);
-        nextStep = (TextView) view.findViewById(R.id.btn_next_step);
-        upStep = (TextView) view.findViewById(R.id.btn_up_step);
-        btnSure = (TextView) view.findViewById(R.id.btn_sure);
 
-        wvYear = (WheelView) view.findViewById(R.id.wv_birth_year);
-        wvMonth = (WheelView) view.findViewById(R.id.wv_birth_month);
-        wvDay = (WheelView) view.findViewById(R.id.wv_birth_day);
+        endYear = (WheelView) rightView.findViewById(R.id.wv_end_year);
+        endMonth = (WheelView) rightView.findViewById(R.id.wv_end_month);
+        endDay = (WheelView) rightView.findViewById(R.id.wv_end_day);
 
-        endYear = (WheelView) view.findViewById(R.id.wv_end_year);
-        endMonth = (WheelView) view.findViewById(R.id.wv_end_month);
-        endDay = (WheelView) view.findViewById(R.id.wv_end_day);
+        DatePagerAdapter datePagerAdapter = new DatePagerAdapter(this,views);
+        date_pager.setAdapter(datePagerAdapter);
 
 
         nextStep.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDateLinear.animate().translationX(-startDateLinear.getMeasuredWidth());
-                endDateLinear.animate().translationX(-startDateLinear.getMeasuredWidth());
+                date_pager.setCurrentItem(1,true);
             }
         });
         upStep.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDateLinear.animate().translationX(0);
-                endDateLinear.animate().translationX(0);
-
+                date_pager.setCurrentItem(0,true);
             }
         });
-
-        //设置SelectPicPopupWindow的View
-        this.setContentView(view);
-        //设置SelectPicPopupWindow弹出窗体的宽
-        this.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        //设置SelectPicPopupWindow弹出窗体的高
-        this.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
-        //设置SelectPicPopupWindow弹出窗体可点击
-        this.setFocusable(true);
-        //设置SelectPicPopupWindow弹出窗体动画效果
-//		this.setAnimationStyle(R.style.AnimBottom);
-        //实例化一个ColorDrawable颜色为半透明
-        ColorDrawable dw = new ColorDrawable(0xb0000000);
-        //设置SelectPicPopupWindow弹出窗体的背景
-        this.setBackgroundDrawable(dw);
-
-        btnSure.setOnClickListener(this);
-        btnCancel.setOnClickListener(this);
 
         if (!issetdata) {
             initData();
@@ -140,25 +123,26 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
         initYears();
         handleStartDate();
         handleEndDate();
+
     }
 
     private void handleEndDate() {
-        endYearAdapter = new CalendarTextAdapter(context, arry_years, setYear(currentYear), maxTextSize, minTextSize);
+        endYearAdapter = new CalendarTextAdapter(this, array_years, setYear(currentEndYear), maxTextSize, minTextSize);
         endYear.setVisibleItems(5);
         endYear.setViewAdapter(endYearAdapter);
-        endYear.setCurrentItem(setYear(currentYear));
+        endYear.setCurrentItem(setYear(currentEndYear));
 
         initMonths(Integer.parseInt(month));
-        endMonthAdapter = new CalendarTextAdapter(context, arry_months, setMonth(currentMonth), maxTextSize, minTextSize);
+        endMonthAdapter = new CalendarTextAdapter(this, array_months, setMonth(currentEndMonth), maxTextSize, minTextSize);
         endMonth.setVisibleItems(5);
         endMonth.setViewAdapter(endMonthAdapter);
-        endMonth.setCurrentItem(setMonth(currentMonth));
+        endMonth.setCurrentItem(setMonth(currentEndMonth));
 
         initDays(Integer.parseInt(day));
-        endDaydapter = new CalendarTextAdapter(context, arry_days, Integer.parseInt(currentDay) - 1, maxTextSize, minTextSize);
+        endDayAdapter = new CalendarTextAdapter(this, array_days, Integer.parseInt(currentEndDay) - 1, maxTextSize, minTextSize);
         endDay.setVisibleItems(5);
-        endDay.setViewAdapter(endDaydapter);
-        endDay.setCurrentItem(Integer.parseInt(currentDay) - 1);
+        endDay.setViewAdapter(endDayAdapter);
+        endDay.setCurrentItem(Integer.parseInt(currentEndDay) - 1);
 
         endYear.addChangingListener(new OnWheelChangedListener() {
 
@@ -167,15 +151,15 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
                 String currentText = (String) endYearAdapter.getItemText(wheel.getCurrentItem());
                 selectEndYear = currentText;
                 setTextViewSize(currentText, endYearAdapter);
-                currentYear = currentText.substring(0, currentText.length() - 1).toString();
-                setYear(currentYear);
+                currentEndYear = currentText.substring(0, currentText.length() - 1).toString();
+                setYear(currentEndYear);
                 initMonths(Integer.parseInt(month));
-                endMonthAdapter = new CalendarTextAdapter(context, arry_months, 0, maxTextSize, minTextSize);
+                endMonthAdapter = new CalendarTextAdapter(DatePagerActivity.this, array_months, 0, maxTextSize, minTextSize);
                 endMonth.setVisibleItems(5);
                 endMonth.setViewAdapter(endMonthAdapter);
                 endMonth.setCurrentItem(0);
 
-                calDays(currentYear, month);
+                calDays(currentEndYear, month);
             }
         });
 
@@ -202,12 +186,12 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
                 setTextViewSize(currentText, endMonthAdapter);
                 setMonth(currentText.substring(0, 1));
                 initDays(Integer.parseInt(day));
-                endDaydapter = new CalendarTextAdapter(context, arry_days, 0, maxTextSize, minTextSize);
+                endDayAdapter = new CalendarTextAdapter(DatePagerActivity.this, array_days, 0, maxTextSize, minTextSize);
                 endDay.setVisibleItems(5);
-                endDay.setViewAdapter(endDaydapter);
+                endDay.setViewAdapter(endDayAdapter);
                 endDay.setCurrentItem(0);
 
-                calDays(currentYear, month);
+                calDays(currentEndYear, month);
             }
         });
 
@@ -229,8 +213,8 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
 
             @Override
             public void onChanged(WheelView wheel, int oldValue, int newValue) {
-                String currentText = (String) endDaydapter.getItemText(wheel.getCurrentItem());
-                setTextViewSize(currentText, endDaydapter);
+                String currentText = (String) endDayAdapter.getItemText(wheel.getCurrentItem());
+                setTextViewSize(currentText, endDayAdapter);
                 selectEndDay = currentText;
             }
         });
@@ -244,28 +228,28 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
 
             @Override
             public void onScrollingFinished(WheelView wheel) {
-                String currentText = (String) endDaydapter.getItemText(wheel.getCurrentItem());
-                setTextViewSize(currentText, endDaydapter);
+                String currentText = (String) endDayAdapter.getItemText(wheel.getCurrentItem());
+                setTextViewSize(currentText, endDayAdapter);
             }
         });
     }
 
     private void handleStartDate() {
-        mYearAdapter = new CalendarTextAdapter(context, arry_years, setYear(currentYear), maxTextSize, minTextSize);
+        mYearAdapter = new CalendarTextAdapter(this, array_years, setYear(currentYear), maxTextSize, minTextSize);
         wvYear.setVisibleItems(5);
         wvYear.setViewAdapter(mYearAdapter);
         wvYear.setCurrentItem(setYear(currentYear));
 
         initMonths(Integer.parseInt(month));
-        mMonthAdapter = new CalendarTextAdapter(context, arry_months, setMonth(currentMonth), maxTextSize, minTextSize);
+        mMonthAdapter = new CalendarTextAdapter(this, array_months, setMonth(currentMonth), maxTextSize, minTextSize);
         wvMonth.setVisibleItems(5);
         wvMonth.setViewAdapter(mMonthAdapter);
         wvMonth.setCurrentItem(setMonth(currentMonth));
 
         initDays(Integer.parseInt(day));
-        mDaydapter = new CalendarTextAdapter(context, arry_days, Integer.parseInt(currentDay) - 1, maxTextSize, minTextSize);
+        mDayAdapter = new CalendarTextAdapter(this, array_days, Integer.parseInt(currentDay) - 1, maxTextSize, minTextSize);
         wvDay.setVisibleItems(5);
-        wvDay.setViewAdapter(mDaydapter);
+        wvDay.setViewAdapter(mDayAdapter);
         wvDay.setCurrentItem(Integer.parseInt(currentDay) - 1);
 
         wvYear.addChangingListener(new OnWheelChangedListener() {
@@ -279,7 +263,7 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
                 Log.d("currentYear==", currentYear);
                 setYear(currentYear);
                 initMonths(Integer.parseInt(month));
-                mMonthAdapter = new CalendarTextAdapter(context, arry_months, 0, maxTextSize, minTextSize);
+                mMonthAdapter = new CalendarTextAdapter(DatePagerActivity.this, array_months, 0, maxTextSize, minTextSize);
                 wvMonth.setVisibleItems(5);
                 wvMonth.setViewAdapter(mMonthAdapter);
                 wvMonth.setCurrentItem(0);
@@ -311,9 +295,9 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
                 setTextViewSize(currentText, mMonthAdapter);
                 setMonth(currentText.substring(0, 1));
                 initDays(Integer.parseInt(day));
-                mDaydapter = new CalendarTextAdapter(context, arry_days, 0, maxTextSize, minTextSize);
+                mDayAdapter = new CalendarTextAdapter(DatePagerActivity.this, array_days, 0, maxTextSize, minTextSize);
                 wvDay.setVisibleItems(5);
-                wvDay.setViewAdapter(mDaydapter);
+                wvDay.setViewAdapter(mDayAdapter);
                 wvDay.setCurrentItem(0);
 
                 calDays(currentYear, month);
@@ -338,8 +322,8 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
 
             @Override
             public void onChanged(WheelView wheel, int oldValue, int newValue) {
-                String currentText = (String) mDaydapter.getItemText(wheel.getCurrentItem());
-                setTextViewSize(currentText, mDaydapter);
+                String currentText = (String) mDayAdapter.getItemText(wheel.getCurrentItem());
+                setTextViewSize(currentText, mDayAdapter);
                 selectDay = currentText;
             }
         });
@@ -353,8 +337,8 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
 
             @Override
             public void onScrollingFinished(WheelView wheel) {
-                String currentText = (String) mDaydapter.getItemText(wheel.getCurrentItem());
-                setTextViewSize(currentText, mDaydapter);
+                String currentText = (String) mDayAdapter.getItemText(wheel.getCurrentItem());
+                setTextViewSize(currentText, mDayAdapter);
             }
         });
     }
@@ -362,28 +346,28 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
 
     public void initYears() {
         for (int i = Integer.parseInt(getYear()); i < Integer.parseInt(getYear()) + 50; i++) {
-            arry_years.add(i + "年");
+            array_years.add(i + "年");
         }
     }
 
     public void initMonths(int months) {
-        arry_months.clear();
+        array_months.clear();
         for (int i = 1; i <= months; i++) {
-            arry_months.add(i + "月");
+            array_months.add(i + "月");
         }
     }
 
     public void initDays(int days) {
-        arry_days.clear();
+        array_days.clear();
         for (int i = 1; i <= days; i++) {
-            arry_days.add(i + "日");
+            array_days.add(i + "日");
         }
     }
 
     private class CalendarTextAdapter extends AbstractWheelTextAdapter1 {
         ArrayList<String> list;
 
-        protected CalendarTextAdapter(Context context, ArrayList<String> list, int currentItem, int maxsize, int minsize) {
+        private CalendarTextAdapter(Context context, ArrayList<String> list, int currentItem, int maxsize, int minsize) {
             super(context, R.layout.item_birth_year, NO_RESOURCE, currentItem, maxsize, minsize);
             this.list = list;
             setItemTextResource(R.id.tempValue);
@@ -406,45 +390,28 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
         }
     }
 
-    public void setBirthdayListener(OnBirthListener onBirthListener) {
+    public void setBirthdayListener(ChangeDatePopwindow.OnBirthListener onBirthListener) {
         this.onBirthListener = onBirthListener;
     }
 
-    @Override
-    public void onClick(View v) {
-
-        if (v == btnSure) {
-            if (onBirthListener != null) {
-                onBirthListener.onClick(selectYear, selectMonth, selectDay, selectEndYear, selectEndMonth, selectEndDay);
-            }
-        } else {
-            dismiss();
-        }
-        dismiss();
-
-    }
-
-    public interface OnBirthListener {
-        public void onClick(String year, String month, String day, String endYear, String endMonth, String endDay);
-    }
 
     /**
      * 设置字体大小
      *
-     * @param curriteItemText
+     * @param currentItemText
      * @param adapter
      */
-    public void setTextViewSize(String curriteItemText, CalendarTextAdapter adapter) {
+    public void setTextViewSize(String currentItemText, CalendarTextAdapter adapter) {
         ArrayList<View> arrayList = adapter.getTestViews();
         int size = arrayList.size();
         String currentText;
         for (int i = 0; i < size; i++) {
-            TextView textvew = (TextView) arrayList.get(i);
-            currentText = textvew.getText().toString();
-            if (curriteItemText.equals(currentText)) {
-                textvew.setTextSize(maxTextSize);
+            TextView textView = (TextView) arrayList.get(i);
+            currentText = textView.getText().toString();
+            if (currentItemText.equals(currentText)) {
+                textView.setTextSize(maxTextSize);
             } else {
-                textvew.setTextSize(minTextSize);
+                textView.setTextSize(minTextSize);
             }
         }
     }
@@ -575,5 +542,34 @@ public class ChangeDatePopwindow extends PopupWindow implements View.OnClickList
 //		if (year.equals( getYear()) && month .equals( getMonth())) {
 //			this.day = getDay();//为了显示到当前月的当前日
 //		}
+    }
+
+    class DatePagerAdapter extends PagerAdapter{
+        private Context mContext;
+        private ArrayList<View> mViews;
+        public DatePagerAdapter(Context context,ArrayList<View> views){
+            this.mContext = context;
+            this.mViews = views;
+        }
+        @Override
+        public int getCount() {
+            return mViews.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+        @Override
+        public void destroyItem(ViewGroup view, int position, Object object) {
+            view.removeView((View)object);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            View view = mViews.get(position);
+            container.addView(mViews.get(position));
+            return view;
+        }
     }
 }
