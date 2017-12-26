@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dabing.learnandroid.bugtest.RentShopActivity;
 import com.dabing.learnandroid.utils.Utils;
 
 import java.util.ArrayList;
@@ -42,21 +43,24 @@ public class MainActivity extends AppCompatActivity {
 //                Intent intent = new Intent();
 //                intent.setClass(MainActivity.this,DatePagerActivity.class);
 //                startActivity(intent);
-                ArrayList<String> startDateArray = new ArrayList<>();
-                startDateArray.add("2018");
-                startDateArray.add("2");
-                startDateArray.add("20");
-                DateChoosePagerFragment instance = DateChoosePagerFragment.getInstance(0,"2018-09-10","2019-08-11");
-                instance.setOnDateSelectListener(new DateChoosePagerFragment.OnDateSelectListener() {
-                    @Override
-                    public void onClick(String year, String month, String day, String endYear, String endMonth, String endDay) {
-                        startDate.setText(year+month+day);
-                        endDate.setText(endYear+endMonth+endDay);
-                        Toast.makeText(MainActivity.this,year+month+day+endYear+endMonth+endDay,Toast.LENGTH_LONG).show();
-                    }
-                });
-                FragmentManager fragmentManager = getFragmentManager();
-                instance.show(fragmentManager,"date");
+//                ArrayList<String> startDateArray = new ArrayList<>();
+//                startDateArray.add("2018");
+//                startDateArray.add("2");
+//                startDateArray.add("20");
+//                DateChoosePagerFragment instance = DateChoosePagerFragment.getInstance(0,"2018-09-10","2019-08-11");
+//                instance.setOnDateSelectListener(new DateChoosePagerFragment.OnDateSelectListener() {
+//                    @Override
+//                    public void onClick(String year, String month, String day, String endYear, String endMonth, String endDay) {
+//                        startDate.setText(year+month+day);
+//                        endDate.setText(endYear+endMonth+endDay);
+//                        Toast.makeText(MainActivity.this,year+month+day+endYear+endMonth+endDay,Toast.LENGTH_LONG).show();
+//                    }
+//                });
+//                FragmentManager fragmentManager = getFragmentManager();
+//                instance.show(fragmentManager,"date");
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, RentShopActivity.class);
+                startActivity(intent);
             }
         });
         main = (LinearLayout) findViewById(R.id.main);

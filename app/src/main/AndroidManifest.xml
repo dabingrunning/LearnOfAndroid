@@ -18,6 +18,7 @@
         </activity>
         <activity android:name=".DateActivity" />
         <activity android:name=".DatePagerActivity" />
+        <activity android:name=".bugtest.RentShopActivity" />
     </application>
 
 </manifest>

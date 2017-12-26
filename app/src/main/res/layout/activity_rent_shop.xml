@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/ll_shaixuan"
+        android:layout_width="match_parent"
+        android:layout_height="80px"
+        android:layout_gravity="center_horizontal"
+        android:background="#ffffff"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
+
+        <TextView
+            android:id="@+id/filter_region"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingRight="10dp"
+            android:text="位置" />
+
+        <TextView
+            android:id="@+id/filter_subway"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingRight="10dp"
+            android:text="位置"
+            android:visibility="gone" />
+
+        <!--<ImageView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:src="@color/line_gray" />-->
+
+        <TextView
+            android:id="@+id/filter_price"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingRight="10dp"
+            android:text="价格" />
+
+        <!--<ImageView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:src="@color/line_gray" />-->
+
+        <TextView
+            android:id="@+id/filter_area"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingRight="10dp"
+            android:text="面积" />
+
+        <!--<ImageView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:src="@color/line_gray" />-->
+
+        <TextView
+            android:id="@+id/filter_character"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingRight="10dp"
+            android:text="排序" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_agent_rent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="60px"
+            android:adjustViewBounds="true"
+            android:drawablePadding="16px"
+            android:gravity="center"
+            android:text="没有找到相关房源，换个关键词试一试吧！"
+            android:visibility="gone" />
+
+        <!--<android.support.v4.widget.SwipeRefreshLayout-->
+        <!--android:id="@+id/filter_swipeRefreshLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:visibility="visible">-->
+
+        <com.dabing.learnandroid.bugtest.MyScrollView
+            android:id="@+id/sv_rent_shop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/rl_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="24px"
+                    android:layout_marginRight="24px"
+                    android:layout_marginTop="30px">
+
+                    <ImageView
+                        android:id="@+id/iv_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="160px"
+                        android:src="@color/colorAccent" />
+
+                    <ImageView
+                        android:id="@+id/iv_header_close"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@+id/iv_header"
+                        android:layout_alignTop="@+id/iv_header"
+                        android:layout_marginRight="20px"
+                        android:layout_marginTop="20px"
+                        android:src="@mipmap/ic_launcher" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:descendantFocusability="blocksDescendants">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/filter_recycleView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@null"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:scrollbars="none" />
+                </RelativeLayout>
+
+
+            </LinearLayout>
+        </com.dabing.learnandroid.bugtest.MyScrollView>
+        <!--</android.support.v4.widget.SwipeRefreshLayout>-->
+
+        <!-- 位置筛选栏的三列菜单 -->
+        <LinearLayout
+            android:id="@+id/filter_item_list_ll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00ffffff"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ListView
+                android:id="@+id/filter_item_list1"
+                android:layout_width="0dp"
+                android:layout_height="250dp"
+                android:layout_weight="1"
+                android:background="#ffffff"
+                android:divider="@null"
+                android:paddingLeft="20px"
+                android:scrollbars="none"
+                android:visibility="gone"></ListView>
+
+            <ListView
+                android:id="@+id/filter_item_list2"
+                android:layout_width="0dp"
+                android:layout_height="250dp"
+                android:layout_weight="1"
+                android:background="#ffffff"
+                android:divider="@null"
+                android:scrollbars="none"
+                android:visibility="gone" />
+
+            <ListView
+                android:id="@+id/filter_item_list3"
+                android:layout_width="0dp"
+                android:layout_height="250dp"
+                android:layout_weight="1"
+                android:background="#ffffff"
+                android:divider="@null"
+                android:paddingRight="20px"
+                android:scrollbars="none"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- 价格筛选栏的二列菜单 -->
+        <LinearLayout
+            android:id="@+id/filter_price_list_ll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#00ffffff"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ListView
+                android:id="@+id/lv_filter_price_1"
+                android:layout_width="0dp"
+                android:layout_height="250dp"
+                android:layout_weight="1"
+                android:background="#ffffff"
+                android:divider="@null"
+                android:paddingLeft="10dp"
+                android:scrollbars="none"
+                android:visibility="gone" />
+
+            <ListView
+                android:id="@+id/lv_filter_price_2"
+                android:layout_width="0dp"
+                android:layout_height="250dp"
+                android:layout_weight="1"
+                android:background="#ff545b"
+                android:divider="@null"
+                android:paddingRight="10dp"
+                android:scrollbars="none"
+                android:visibility="gone" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>
